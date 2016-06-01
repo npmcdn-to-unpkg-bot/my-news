@@ -56,12 +56,16 @@
 					var self = this;
 					categoryService.get(category._id, {}, function(error, result) {
 						self.categoryList.push(result);
+						$.each(result.articles, function(i, article) {
+							self.addArticle(article);
+						});
 					});
 				},
 				addCategory: function(category) {
 					this.menuTop.append('<li><a href="#" id="'+category._id+'">'+category.displayName+'</a></li>');
 					var self = this;
 					$('#'+category._id).on('click', function() {
+						// TODO: check if category already added to list and return if yes
 						self.getCategory(category);
 					});
 				},
@@ -74,6 +78,18 @@
 						});
 					});
 				},
+				addArticle: function(article) {
+					var articleTag = $('<article id="'+article._id+'" class="article well"><h4><a href="'+article.link+'">'+article.title+'</a></h4><div>'+article.body+'</div></article>');
+					
+
+					var articles = $('#articlesList').children('articles.article');
+					if (articles.length == 0) {
+						$('#articlesList').append(articleTag);
+					}
+					else {
+						articles.before(articleTag);
+					}
+				}
 			};
 
 			categoryView.init();
