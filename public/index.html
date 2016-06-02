@@ -94,7 +94,12 @@ var categoryView = {
 		});
 	},
 	addArticle: function(article) {
-		var articleTag = $('<article id="'+article._id+'" class="article well '+article.category_id+'"><h4><a href="'+article.link+'">'+article.title+'</a></h4><div>'+article.body+'</div></article>');
+		var imageUrl = 'http://lorempixel.com/400/200/';
+
+		if (article.image) {
+			imageUrl = article.image;
+		}
+		var articleTag = $('<article id="'+article._id+'" class="article row well '+article.category_id+'"><div class="img-wrapper col-xs-2"><img class="img-responsive img-thumbnail" src="'+imageUrl+'" /></div><div class="article-content-wrapper col-xs-10"><h4><a href="'+article.link+'">'+article.title+'</a></h4><div>'+article.body+'</div></div></article>');
 
 		var articles = $('#list_'+article.category_id).children('article.article');
 		if (articles.length == 0) {
