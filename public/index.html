@@ -1,103 +1,127 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<title>My News</title>
-		<meta name="description" content="My list of news.">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-	</head>
-	<body>
-		<nav class="navbar navbar-default">
-			<div class="container">
-				<div class="navbar-header">
-					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-						<span class="sr-only">Toggle navigation</span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-					</button>
-					<a class="navbar-brand" href="#">My News</a>
-				</div>
-				<div class="collapse navbar-collapse">
-					<ul class="nav navbar-nav" id="menuTop">
-					</ul>
-				</div>
+<head>
+	<meta charset="utf-8">
+	<title>My News</title>
+	<meta name="description" content="My list of news.">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+</head>
+<body>
+<nav class="navbar navbar-default">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#">My News</a>
+		</div>
+		<div class="collapse navbar-collapse">
+			<ul class="nav navbar-nav" id="menuTop">
+			</ul>
+		</div>
 
-			</div>
-		</nav>
-		<main>
-			<div class="container">
-				<div id="articlesList">
-				</div>
-			</div>
-		</main>
-		<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/core-js/2.1.4/core.min.js"></script>
-		<script src="//npmcdn.com/feathers-client@^1.0.0/dist/feathers.js"></script>
-		<script src="socket.io/socket.io.js"></script>
-		<script type="text/javascript">
-		$(document).ready(function() {
+	</div>
+</nav>
+<main>
+	<div class="container">
+		<div id="articlesList">
+		</div>
+	</div>
+</main>
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/core-js/2.1.4/core.min.js"></script>
+<script src="//npmcdn.com/feathers-client@^1.0.0/dist/feathers.js"></script>
+<script src="socket.io/socket.io.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
 
-			if(!window.jQuery) {
-				console.log('no jquery');
-			}
+var socket = io();
+var app = feathers();
+app.configure(feathers.socketio(socket));
 
-			var socket = io();
-			var app = feathers();
-			app.configure(feathers.socketio(socket));
+var categoryService = app.service('categories');
+var articleService = app.service('articles');
 
-			var categoryService = app.service('categories');
-
-			var categoryView = {
-				categoryList: [],
-				menuTop: $('#menuTop'),
-				getCategory: function(category) {
-					var self = this;
-					categoryService.get(category._id, {}, function(error, result) {
-						self.categoryList.push(result);
-						$.each(result.articles, function(i, article) {
-							self.addArticle(article);
-						});
-					});
-				},
-				addCategory: function(category) {
-					this.menuTop.append('<li><a href="#" id="'+category._id+'">'+category.displayName+'</a></li>');
-					var self = this;
-					$('#'+category._id).on('click', function() {
-						// TODO: check if category already added to list and return if yes
-						self.getCategory(category);
-					});
-				},
-				init: function() {
-					var self = this;
-
-					categoryService.find({}, function(error, result) {
-						$.each(result.data, function(i, cat) {
-							self.addCategory(cat);
-						});
-					});
-				},
-				addArticle: function(article) {
-					var articleTag = $('<article id="'+article._id+'" class="article well"><h4><a href="'+article.link+'">'+article.title+'</a></h4><div>'+article.body+'</div></article>');
-					
-
-					var articles = $('#articlesList').children('articles.article');
-					if (articles.length == 0) {
-						$('#articlesList').append(articleTag);
-					}
-					else {
-						articles.before(articleTag);
-					}
+var categoryView = {
+	categoryList: [],
+	menuTop: $('#menuTop'),
+	articlesList: $('#articlesList'),
+	displayCategory: function(category) {
+		this.articlesList.children('.category-list').addClass('hidden');
+		$('#list_'+category._id).removeClass('hidden');
+		var self = this;
+		$.each(category.articles, function(i, article) {
+			self.addArticle(article);
+		});
+	},
+	getCategory: function(category) {
+		var self = this;
+		categoryService.get(category._id, {}, function(error, result) {
+			self.categoryList.push(result);
+			self.displayCategory(result);
+		});
+	},
+	addCategory: function(category) {
+		this.menuTop.append('<li><a href="#" id="link_'+category._id+'">'+category.displayName+'</a></li>');
+		this.articlesList.append('<div class="hidden category-list" id="list_'+category._id+'"></div>');
+		var self = this;
+		$('#link_'+category._id).on('click', function() {
+			// TODO: check if category already added to list and return if yes
+			var isGalleryInList = false;
+			$.each(self.categoryList, function(i, cat) {
+				if (category._id == cat._id) {
+					isGalleryInList = true;
+					return;
 				}
-			};
+			});
 
-			categoryView.init();
+			if (!isGalleryInList) {
+				self.getCategory(category);
+			}
+		});
+	},
+	init: function() {
+		var self = this;
 
-			categoryService.on('created', function(category) {
-				categoryView.addCategory(category);
+		categoryService.find({}, function(error, result) {
+			$.each(result.data, function(i, cat) {
+				self.addCategory(cat);
 			});
 		});
-		</script>
-	</body>
+	},
+	addArticle: function(article) {
+		var articleTag = $('<article id="'+article._id+'" class="article well '+article.category_id+'"><h4><a href="'+article.link+'">'+article.title+'</a></h4><div>'+article.body+'</div></article>');
+
+		var articles = $('#list_'+article.category_id).children('article.article');
+		if (articles.length == 0) {
+			$('#list_'+article.category_id).append(articleTag);
+		}
+		else {
+			articles.before(articleTag);
+		}
+	}
+};
+
+categoryView.init();
+
+categoryService.on('created', function(category) {
+	categoryView.addCategory(category);
+});
+
+articleService.on('created', function(article) {
+	$.each(categoryView.categoryList, function(i, cat) {
+		if (article.category_id == cat._id) {
+			cat.articles.push(article);
+			categoryView.addArticle(article);
+		}
+	});
+});
+
+});
+</script>
+</body>
 </html>
