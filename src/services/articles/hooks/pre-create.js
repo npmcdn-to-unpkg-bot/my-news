@@ -23,14 +23,14 @@ module.exports = function(options) {
 		articleToSanitize.createdAt = new Date();
 
 		return this.find({ query: { title: articleToSanitize.title, link: articleToSanitize.link, $limit: 1 } }).then(result => {
-			if (result.data.length !== 0) {
+			if (result.length !== 0) {
 				throw new Error('Article already exists.');
 			}
 
 			if (articleToSanitize.categoryName) {
 				return hook.app.service('categories').find({ query: { shortName: articleToSanitize.categoryName, $limit: 1 }}).then(result => {
-					if (result.data.length !== 0) {
-						articleToSanitize.category_id = result.data[0]._id;
+					if (result.length !== 0) {
+						articleToSanitize.category_id = result[0]._id;
 					}
 
 					delete articleToSanitize.categoryName;

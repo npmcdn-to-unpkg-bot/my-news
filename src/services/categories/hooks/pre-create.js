@@ -21,7 +21,7 @@ module.exports = function(options) {
 		}
 
 		return this.find({ query: { shortName: categoryToSanitize.shortName, $limit: 1 } }).then(result => {
-			if (result.data.length !== 0) {
+			if (result.length !== 0) {
 				throw new Error('Category already exists.');
 			}
 		});

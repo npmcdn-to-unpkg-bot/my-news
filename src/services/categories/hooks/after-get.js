@@ -13,8 +13,13 @@ module.exports = function(options) {
 	return function(hook) {
 		var category = hook.result;
 
-		return hook.app.service('articles').find({ query: { category_id: category._id }}).then(result => {
-			category.articles = result.data;
+		return hook.app.service('articles').find({
+			query: {
+				category_id: category._id,
+				$sort: { createdAt: 1 }
+			}
+		}).then(result => {
+			category.articles = result;
 		});
 	};
 };

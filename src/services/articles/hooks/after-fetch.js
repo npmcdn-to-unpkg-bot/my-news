@@ -14,13 +14,13 @@ module.exports = function(options) {
 		var res = hook.result;
 
 		var fetchRelatedCategory = function(result) {
-			if(result.data) {
+			if(Array.isArray(result)) {
 
 			}
 			else {
 				var article = result;
 				return hook.app.service('categories').find({ query: { _id: article.category_id }}).then(result => {
-					article.category = result.data;
+					article.category = result;
 				});
 			}
 		};
