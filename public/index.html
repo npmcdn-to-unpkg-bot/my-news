@@ -17,7 +17,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="#">My News</a>
+			<a id="#brand" class="navbar-brand" href="#">My News</a>
 		</div>
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav" id="menuTop">
@@ -29,6 +29,8 @@
 <main>
 	<div class="container">
 		<div id="articlesList">
+			<div id="category_all" class="category-list">
+			</div>
 		</div>
 	</div>
 </main>
@@ -47,82 +49,71 @@ app.configure(feathers.socketio(socket));
 var categoryService = app.service('categories');
 var articleService = app.service('articles');
 
-var categoryView = {
-	categoryList: [],
+var viewController = {
 	menuTop: $('#menuTop'),
 	articlesList: $('#articlesList'),
+	categories: [],
 	displayCategory: function(category) {
-		this.articlesList.children('.category-list').addClass('hidden');
+		$('.category-list').addClass('hidden');
 		$('#list_'+category._id).removeClass('hidden');
-		var self = this;
-		$.each(category.articles, function(i, article) {
-			self.addArticle(article);
-		});
 	},
-	getCategory: function(category) {
-		var self = this;
-		categoryService.get(category._id, {}, function(error, result) {
-			self.categoryList.push(result);
-			self.displayCategory(result);
-		});
+	addArticle: function(article) {
+		var hasImage = false;
+		if (article.image) {
+			hasImage = true;
+		}
+
+		var articleTag = $('<article id="'+article._id+'" class="article row well '+article.category_id+'"></article>');
+
+		var articleWidth = 'col-xs-12';
+		if (hasImage) {
+			articleTag.append('<div class="img-wrapper col-xs-2"><img class="img-responsive" src="'+article.image+'" /></div>');
+			articleWidth = 'col-xs-10';
+		}
+		articleTag.append('<div class="article-content-wrapper '+articleWidth+'"><h4><a href="'+article.link+'" target="_blank">'+article.title+'</a></h4><div>'+article.body+'</div></div>');
+		$('#list_'+article.category_id).prepend(articleTag);
+		$('#category_all').prepend(articleTag);
 	},
 	addCategory: function(category) {
-		this.menuTop.append('<li><a href="#" id="link_'+category._id+'">'+category.displayName+'</a></li>');
-		this.articlesList.append('<div class="hidden category-list" id="list_'+category._id+'"></div>');
 		var self = this;
-		$('#link_'+category._id).on('click', function() {
-			// TODO: check if category already added to list and return if yes
-			var isGalleryInList = false;
-			$.each(self.categoryList, function(i, cat) {
-				if (category._id == cat._id) {
-					isGalleryInList = true;
-					return;
-				}
+		categoryService.get(category._id, {}, function(error, result) {
+			self.categories.push(result);
+			self.menuTop.append('<li><a href="#" id="link_'+result._id+'">'+result.displayName+'</a></li>');
+			self.articlesList.append('<div class="hidden category-list" id="list_'+result._id+'"></div>');
+			$.each(result.articles, function() {
+				self.addArticle(this);
 			});
-
-			if (!isGalleryInList) {
-				self.getCategory(category);
-			}
+			$('#link_'+result._id).click(function() {
+				self.displayCategory(result);
+			});
 		});
 	},
 	init: function() {
 		var self = this;
-
 		categoryService.find({}, function(error, result) {
 			$.each(result, function(i, cat) {
 				self.addCategory(cat);
 			});
 		});
-	},
-	addArticle: function(article) {
-		var imageUrl = 'http://lorempixel.com/400/200/';
 
-		if (article.image) {
-			imageUrl = article.image;
-		}
-		var articleTag = $('<article id="'+article._id+'" class="article row well '+article.category_id+'"><div class="img-wrapper col-xs-2"><img class="img-responsive" src="'+imageUrl+'" /></div><div class="article-content-wrapper col-xs-10"><h4><a href="'+article.link+'">'+article.title+'</a></h4><div>'+article.body+'</div></div></article>');
-
-		var articles = $('#list_'+article.category_id).children('article.article');
-		if (articles.length == 0) {
-			$('#list_'+article.category_id).append(articleTag);
-		}
-		else {
-			articles.before(articleTag);
-		}
+		$('#brand').click(function() {
+			$('.category-list').addClass('hidden');
+			$('#category_all').removeClass('hidden');
+		});
 	}
 };
 
-categoryView.init();
+viewController.init();
 
 categoryService.on('created', function(category) {
-	categoryView.addCategory(category);
+	viewController.addCategory(category);
 });
 
 articleService.on('created', function(article) {
-	$.each(categoryView.categoryList, function(i, cat) {
+	$.each(viewController.categories, function(i, cat) {
 		if (article.category_id == cat._id) {
 			cat.articles.push(article);
-			categoryView.addArticle(article);
+			viewController.addArticle(article);
 		}
 	});
 });
