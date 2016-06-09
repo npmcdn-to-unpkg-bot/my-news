@@ -17,7 +17,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a id="#brand" class="navbar-brand" href="#">My News</a>
+			<a id="brand" class="navbar-brand" href="#">My News</a>
 		</div>
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav" id="menuTop">
@@ -29,8 +29,6 @@
 <main>
 	<div class="container">
 		<div id="articlesList">
-			<div id="category_all" class="category-list">
-			</div>
 		</div>
 	</div>
 </main>
@@ -54,16 +52,16 @@ var viewController = {
 	articlesList: $('#articlesList'),
 	categories: [],
 	displayCategory: function(category) {
-		$('.category-list').addClass('hidden');
-		$('#list_'+category._id).removeClass('hidden');
+		$('article.article').addClass('hidden');
+		$('article.'+category._id).removeClass('hidden');
 	},
-	addArticle: function(article) {
+	addArticle: function(article, isHidden = false) {
 		var hasImage = false;
 		if (article.image) {
 			hasImage = true;
 		}
 
-		var articleTag = $('<article id="'+article._id+'" class="article row well '+article.category_id+'"></article>');
+		var articleTag = $('<article id="'+article._id+'" class="article row well '+article.category_id + (isHidden ? ' hidden' : '')+'"></article>');
 
 		var articleWidth = 'col-xs-12';
 		if (hasImage) {
@@ -71,21 +69,14 @@ var viewController = {
 			articleWidth = 'col-xs-10';
 		}
 		articleTag.append('<div class="article-content-wrapper '+articleWidth+'"><h4><a href="'+article.link+'" target="_blank">'+article.title+'</a></h4><div>'+article.body+'</div></div>');
-		$('#list_'+article.category_id).prepend(articleTag);
-		$('#category_all').prepend(articleTag);
+		this.articlesList.prepend(articleTag);
 	},
 	addCategory: function(category) {
 		var self = this;
-		categoryService.get(category._id, {}, function(error, result) {
-			self.categories.push(result);
-			self.menuTop.append('<li><a href="#" id="link_'+result._id+'">'+result.displayName+'</a></li>');
-			self.articlesList.append('<div class="hidden category-list" id="list_'+result._id+'"></div>');
-			$.each(result.articles, function() {
-				self.addArticle(this);
-			});
-			$('#link_'+result._id).click(function() {
-				self.displayCategory(result);
-			});
+		this.categories.push(category);
+		this.menuTop.append('<li><a href="#" id="link_'+category._id+'">'+category.displayName+'</a></li>');
+		$('#link_'+category._id).click(function() {
+			self.displayCategory(category);
 		});
 	},
 	init: function() {
@@ -96,9 +87,14 @@ var viewController = {
 			});
 		});
 
+		articleService.find({ query: { $sort: { createdAt: 1 }}}, function(error, result) {
+			$.each(result, function(i, article) {
+				viewController.addArticle(article);
+			});
+		});
+
 		$('#brand').click(function() {
-			$('.category-list').addClass('hidden');
-			$('#category_all').removeClass('hidden');
+			$('article.article').removeClass('hidden');
 		});
 	}
 };
@@ -110,12 +106,10 @@ categoryService.on('created', function(category) {
 });
 
 articleService.on('created', function(article) {
-	$.each(viewController.categories, function(i, cat) {
-		if (article.category_id == cat._id) {
-			cat.articles.push(article);
-			viewController.addArticle(article);
-		}
-	});
+	// Figure out if the article's category is currently displayed.
+	var isCategoryHidden = $('article.'+article.category_id).first().hasClass('hidden');
+
+	viewController.addArticle(article, isCategoryHidden);
 });
 
 });
