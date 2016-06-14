@@ -4,36 +4,37 @@
 	<meta charset="utf-8">
 	<title>My News</title>
 	<meta name="description" content="My list of news.">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.indigo-pink.min.css" />
 	<link rel="stylesheet" href="/assets/styles/main.css">
 </head>
 <body>
-<nav class="navbar navbar-default navbar-fixed-top">
-	<div class="container">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="" aria-expanded="false">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a id="brand" class="navbar-brand" href="#">My News</a>
+<div class="mdl-layout mdl-js-layout">
+	<header class="mdl-layout__header mdl-shadow-8dp">
+		<div class="mdl-layout-icon"></div>
+		<div class="mdl-layout__header-row">
+			<span class="mdl-layout__title">MyNews</span>
+			<div class="mdl-layout-spacer"></div>
+			<nav class="mdl-navigation" id="menuTop">
+				<a id="all" class="mdl-navigation__link" href="#">All</a>
+			</nav>
 		</div>
-		<div class="collapse navbar-collapse">
-			<ul class="nav navbar-nav" id="menuTop">
-			</ul>
-		</div>
-
+	</header>
+	<div class="mdl-layout__drawer">
+		<span class="mdl-layout__title">MyNews</span>
+		<nav class="mdl-navigation" id="drawer">
+		</nav>
 	</div>
-</nav>
-<main>
-	<div class="container">
-		<div id="articlesList">
+	<main class="mdl-layout__content">
+		<div id="articlesList" class="section mdl-grid mdl-grid--no-spacing">
 		</div>
-	</div>
-</main>
+	</main>
+</div>
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/core-js/2.1.4/core.min.js"></script>
 <script src="//npmcdn.com/feathers-client@^1.0.0/dist/feathers.js"></script>
 <script src="socket.io/socket.io.js"></script>
@@ -52,8 +53,8 @@ var viewController = {
 	articlesList: $('#articlesList'),
 	categories: [],
 	displayCategory: function(category) {
-		$('article.article').addClass('hidden');
-		$('article.'+category._id).removeClass('hidden');
+		$('.article').addClass('hidden');
+		$('.'+category._id).removeClass('hidden');
 	},
 	addArticle: function(article, isHidden = false) {
 		var hasImage = false;
@@ -61,20 +62,41 @@ var viewController = {
 			hasImage = true;
 		}
 
-		var articleTag = $('<article id="'+article._id+'" class="article row well '+article.category_id + (isHidden ? ' hidden' : '')+'"></article>');
-
-		var articleWidth = 'col-xs-12';
+		var articleTag = $('<div id="'+article._id+'" class="article mdl-grid mdl-shadow--2dp '+article.category_id + (isHidden ? ' hidden' : '')+'"></div>');
+		var image = '';
 		if (hasImage) {
-			articleTag.append('<div class="img-wrapper col-xs-2"><img class="img-responsive" src="'+article.image+'" /></div>');
-			articleWidth = 'col-xs-10';
+			image = '<div class="mdl-cell vignette mdl-cell--3-col"><img src="'+article.image+'" /></div>';
 		}
-		articleTag.append('<div class="article-content-wrapper '+articleWidth+'"><h4><a href="'+article.link+'" target="_blank">'+article.title+'</a></h4><div>'+article.body+'</div></div>');
+
+		var title = '';
+
+		console.log(article);
+
+		if (typeof(article.titleHtml) == 'undefined' || article.titleHtml == '') {
+			title = '<h5 class="card-title"><a href="'+article.link+'" target="_blank">'+article.title+'</a></h5>';
+		}
+		else {
+			title = '<div class="card-title">'+article.titleHtml+'</div>';
+		}
+
+		var body = '';
+		if (typeof(article.bodyHtml == 'undefined') || article.bodyHtml == '') {
+			body = article.body;
+		}
+		else {
+			body = article.bodyHtml;
+		}
+
+		var card = '<div class="mdl-card mdl-cell '+(hasImage ? 'mdl-cell--9-col' : 'mdl-cell--12-col')+'"><div class="mdl-card__supporting-text">'+title+body+'</div></div>';
+
+		articleTag.append(image+card);
+
 		this.articlesList.prepend(articleTag);
 	},
 	addCategory: function(category) {
 		var self = this;
 		this.categories.push(category);
-		this.menuTop.append('<li><a href="#" id="link_'+category._id+'">'+category.displayName+'</a></li>');
+		this.menuTop.append('<a class="mdl-navigation__link" id="link_'+category._id+'" href="#">'+category.displayName+'</a>');
 		$('#link_'+category._id).click(function() {
 			self.displayCategory(category);
 		});
@@ -93,8 +115,8 @@ var viewController = {
 			});
 		});
 
-		$('#brand').click(function() {
-			$('article.article').removeClass('hidden');
+		$('#all').click(function() {
+			$('.article').removeClass('hidden');
 		});
 	}
 };
