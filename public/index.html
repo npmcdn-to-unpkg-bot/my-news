@@ -11,13 +11,13 @@
 	<link rel="stylesheet" href="/assets/styles/main.css">
 </head>
 <body>
-<div class="mdl-layout mdl-js-layout">
-	<header class="mdl-layout__header mdl-shadow-8dp">
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+	<header class="mdl-layout__header mdl-shadow--4dp">
 		<div class="mdl-layout-icon"></div>
 		<div class="mdl-layout__header-row">
 			<span class="mdl-layout__title">MyNews</span>
 			<div class="mdl-layout-spacer"></div>
-			<nav class="mdl-navigation" id="menuTop">
+			<nav class="mdl-navigation mdl-layout--large-screen-only" id="menuTop">
 				<a id="all" class="mdl-navigation__link" href="#">All</a>
 			</nav>
 		</div>
@@ -28,7 +28,9 @@
 		</nav>
 	</div>
 	<main class="mdl-layout__content">
-		<div id="articlesList" class="section mdl-grid mdl-grid--no-spacing">
+		<div class="section">
+			<ul id="articlesList" class="mdl-list mdl-shadow--2dp">
+			</ul>
 		</div>
 	</main>
 </div>
@@ -50,6 +52,7 @@ var articleService = app.service('articles');
 
 var viewController = {
 	menuTop: $('#menuTop'),
+	drawer: $('#drawer'),
 	articlesList: $('#articlesList'),
 	categories: [],
 	displayCategory: function(category) {
@@ -62,42 +65,44 @@ var viewController = {
 			hasImage = true;
 		}
 
-		var articleTag = $('<div id="'+article._id+'" class="article mdl-grid mdl-shadow--2dp '+article.category_id + (isHidden ? ' hidden' : '')+'"></div>');
-		var image = '';
-		if (hasImage) {
-			image = '<div class="mdl-cell vignette mdl-cell--3-col"><img src="'+article.image+'" /></div>';
-		}
+		var articleTag = $('<li id="'+article._id+'" class="article mdl-list__item mdl_grid '+article.category_id + (isHidden ? ' hidden' : '')+'"></li>');
 
 		var title = '';
-
-		console.log(article);
-
 		if (typeof(article.titleHtml) == 'undefined' || article.titleHtml == '') {
-			title = '<h5 class="card-title"><a href="'+article.link+'" target="_blank">'+article.title+'</a></h5>';
+			title = '<a href="'+article.link+'" target="_blank">'+article.title+'</a>';
 		}
 		else {
-			title = '<div class="card-title">'+article.titleHtml+'</div>';
+			title = article.titleHtml;
 		}
+		title = '<div class="article-title">'+title+'</div>';
 
 		var body = '';
-		if (typeof(article.bodyHtml == 'undefined') || article.bodyHtml == '') {
+		if (typeof(article.bodyHtml) == 'undefined' || article.bodyHtml == '') {
 			body = article.body;
 		}
 		else {
 			body = article.bodyHtml;
 		}
+		body = '<div class="mdl-list__item-text-body article-body">'+body+'</div>';
 
-		var card = '<div class="mdl-card mdl-cell '+(hasImage ? 'mdl-cell--9-col' : 'mdl-cell--12-col')+'"><div class="mdl-card__supporting-text">'+title+body+'</div></div>';
+		var image = '';
+		if (hasImage) {
+			image = '<img class="article-image img-responsive" src="'+article.image+'" />';
+		}
+		image = '<div class="mdl-list__item-secondary-content mdl-cell mdl-cell--2-col article-image-wrapper">'+image+'</div>';
 
-		articleTag.append(image+card);
+		var articleItem = '<div class="mdl-list__item-primary-content mdl-cell mdl-cell--10-col article-content">'+title+body+'</div>'+image;
+
+		articleTag.append(articleItem);
 
 		this.articlesList.prepend(articleTag);
 	},
 	addCategory: function(category) {
 		var self = this;
 		this.categories.push(category);
-		this.menuTop.append('<a class="mdl-navigation__link" id="link_'+category._id+'" href="#">'+category.displayName+'</a>');
-		$('#link_'+category._id).click(function() {
+		this.menuTop.append('<a class="mdl-navigation__link link_'+category._id+'" href="#">'+category.displayName+'</a>');
+		this.drawer.append('<a class="mdl-navigation__link link_'+category._id+'" href="#">'+category.displayName+'</a>');
+		$('.link_'+category._id).click(function() {
 			self.displayCategory(category);
 		});
 	},
@@ -129,7 +134,7 @@ categoryService.on('created', function(category) {
 
 articleService.on('created', function(article) {
 	// Figure out if the article's category is currently displayed.
-	var isCategoryHidden = $('article.'+article.category_id).first().hasClass('hidden');
+	var isCategoryHidden = $('.article.'+article.category_id).first().hasClass('hidden');
 
 	viewController.addArticle(article, isCategoryHidden);
 });
