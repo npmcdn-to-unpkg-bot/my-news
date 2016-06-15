@@ -37,12 +37,15 @@ p {
 .article-title {
 	flex: 1 100%;
 	margin-bottom: 0.6em;
+}
+.article-title > * {
+	margin: 0;
+	font-weight: 500;
 	font-size: 1.1em;
 	line-height: 1.1em;
-	font-weight: 500;
 }
-.article-title > p {
-	font-weight: 500;
+.article-title > a {
+	font-weight: 600;
 }
 .article-body {
 	flex: 1 100%;
