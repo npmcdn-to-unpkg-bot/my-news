@@ -60,3 +60,7 @@ p {
 	max-width: 1000px;
 	margin: auto;
 }
+
+.mdl-navigation .mdl-navigation__link:hover {
+	opacity: .65;
+}
