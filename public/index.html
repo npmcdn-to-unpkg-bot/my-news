@@ -35,6 +35,7 @@
 	</main>
 </div>
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/core-js/2.1.4/core.min.js"></script>
@@ -67,6 +68,16 @@ var viewController = {
 
 		var articleTag = $('<li id="'+article._id+'" class="article mdl-list__item mdl_grid '+article.category_id + (isHidden ? ' hidden' : '')+'"></li>');
 
+		var datePublished = moment(article.createdAt, moment.ISO_8601);
+		var publishedAt = '<span class="article-date pull-right">'+datePublished.format('ddd, Do MMM YYYY - hh:mm')+'</span>';
+
+		var siteInfo = '';
+		if ((article.siteName && article.siteName !== '') && (article.siteIcon && article.siteIcon !== '')) {
+			siteInfo = '<span class="article-site-info"><img class="icon" src="'+article.siteIcon+'" />'+article.siteName+'</span>';
+		}
+
+		var articleHeader = '<div class="article-header">'+siteInfo+publishedAt+'</div>';
+
 		var title = '';
 		if (typeof(article.titleHtml) == 'undefined' || article.titleHtml == '') {
 			title = '<a href="'+article.link+'" target="_blank">'+article.title+'</a>';
@@ -83,15 +94,17 @@ var viewController = {
 		else {
 			body = article.bodyHtml;
 		}
-		body = '<div class="mdl-list__item-text-body article-body">'+body+'</div>';
+		body = '<div class="article-body">'+body+'</div>';
+
+		var textContainer = '<div class="mdl-list__item-text-body mdl-cell mdl-cell--10-col article-text-wrapper">'+articleHeader+title+body+'</div>';
 
 		var image = '';
 		if (hasImage) {
-			image = '<img class="article-image img-responsive" src="'+article.image+'" />';
+			image = '<img class="img-responsive" src="'+article.image+'" />';
 		}
-		image = '<div class="mdl-list__item-secondary-content mdl-cell mdl-cell--2-col article-image-wrapper">'+image+'</div>';
+		image = '<div class="article-image-wrapper mdl-cell mdl-cell--2-col">'+image+'</div>';
 
-		var articleItem = '<div class="mdl-list__item-primary-content mdl-cell mdl-cell--10-col article-content">'+title+body+'</div>'+image;
+		var articleItem = '<div class="mdl-list__item-primary-content article-content mdl-grid">'+textContainer+image+'</div>';
 
 		articleTag.append(articleItem);
 
