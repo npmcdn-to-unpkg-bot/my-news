@@ -18,13 +18,14 @@
 			<span class="mdl-layout__title">MyNews</span>
 			<div class="mdl-layout-spacer"></div>
 			<nav class="mdl-navigation mdl-layout--large-screen-only" id="menuTop">
-				<a id="all" class="mdl-navigation__link" href="#">All</a>
+				<a class="all mdl-navigation__link" href="#">All</a>
 			</nav>
 		</div>
 	</header>
 	<div class="mdl-layout__drawer">
 		<span class="mdl-layout__title">MyNews</span>
 		<nav class="mdl-navigation" id="drawer">
+			<a class="all mdl-navigation__link" href="#">All</a>
 		</nav>
 	</div>
 	<main class="mdl-layout__content">
@@ -133,7 +134,7 @@ var viewController = {
 			});
 		});
 
-		$('#all').click(function() {
+		$('.all').click(function() {
 			$('.article').removeClass('hidden');
 		});
 	}
