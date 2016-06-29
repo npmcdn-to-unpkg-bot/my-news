@@ -99,6 +99,7 @@ app.addCategory = function(category) {
 	categoryLink.classList.remove('category-template');
 	categoryLink.classList.add('link_'+category._id);
 	categoryLink.textContent = category.displayName;
+	categoryLink.removeAttribute('hidden');
 	app.menuTop.appendChild(categoryLink);
 	app.drawer.appendChild(categoryLink.cloneNode(true));
 	document.querySelectorAll('link_'+category._id).forEach(function(catLink) {
@@ -205,12 +206,20 @@ articleService.on('created', function(article) {
 // --------------------------
 
 categoryService.find({ query: { $sort: { displayName: 1 }}}, function(error, result) {
+	if (!result) {
+		return;
+	}
+
 	result.forEach(function(cat) {
 		app.addCategory(cat);
 	});
 });
 
 articleService.find({ query: { $sort: { createdAt: 1 }}}, function(error, result) {
+	if (!result) {
+		return;
+	}
+
 	result.forEach(function(article) {
 		app.addArticle(article);
 	});
