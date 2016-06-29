@@ -102,7 +102,7 @@ app.addCategory = function(category) {
 	categoryLink.removeAttribute('hidden');
 	app.menuTop.appendChild(categoryLink);
 	app.drawer.appendChild(categoryLink.cloneNode(true));
-	document.querySelectorAll('link_'+category._id).forEach(function(catLink) {
+	document.querySelectorAll('.link_'+category._id).forEach(function(catLink) {
 		catLink.addEventListener('click', function() {
 			app.displayCategory(category);
 		});
@@ -136,12 +136,12 @@ app.addArticle = function(article, isHidden = false) {
 		articleTag.querySelector('.article-date').textContent = datePublished.format('ddd, Do MMM YYYY - hh:mm');
 	}
 
-	if (article.title) {
-		articleTag.querySelector('.article-title').textContent = article.title;
+	if (article.titleHtml) {
+		articleTag.querySelector('.article-title').innerHTML += article.titleHtml;
 	}
 
-	if (article.body) {
-		articleTag.querySelector('.article-body').textContent = article.body;
+	if (article.bodyHtml) {
+		articleTag.querySelector('.article-body').innerHTML += article.bodyHtml;
 	}
 
 	if (article.image && article.image !== '') {
@@ -157,9 +157,12 @@ app.addArticle = function(article, isHidden = false) {
 	app.articlesList.insertBefore(articleTag, app.articlesList.firstChild);
 };
 
-app.hideArticles = function() {
-	var articles = document.querySelectorAll('.article');
-	articles.forEach(function(el) {
+app.hideArticles = function(categoryClass = '') {
+	if (categoryClass !== '') {
+		categoryClass = '.'+categoryClass;
+	}
+
+	document.querySelectorAll('.article'+categoryClass).forEach(function(el) {
 		el.style.display = 'none';
 	});
 };
