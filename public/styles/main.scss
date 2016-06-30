@@ -1,0 +1,178 @@
+html {
+	box-sizing: border-box;
+}
+
+*, *:before, *:after {
+	box-sizing: inherit;
+}
+
+body {
+	background: #f2f2f2;
+	color: #424242;
+}
+
+a {
+	text-decoration: none;
+}
+
+p {
+	line-height: inherit;
+}
+
+.img-responsive {
+	margin: auto;
+	max-width: 100%;
+}
+
+.mdl-navigation .mdl-navigation__link:hover {
+	opacity: .65;
+}
+
+.section {
+	max-width: 800px;
+	margin: auto;
+}
+
+#articlesList {
+	background: #fff;
+	margin: 0;
+	padding: 0;
+}
+
+@media only screen and (min-width: 300px) {
+
+	.article {
+		border-bottom: 1px solid #f3f3f3;
+		align-items: flex-start;
+
+		.article-content {
+
+			.article-text-wrapper, .article-image-wrapper {
+				margin: auto;
+				overflow: hidden;
+				max-height: 6em;
+			}
+
+			.article-text-wrapper {
+				flex: 1 0 80%;
+				padding: 2px;
+
+				.article-header {
+					font-size: 0.9em;
+					margin-bottom: 0.4em;
+					display: flex;
+					justify-content: space-between;
+					align-items: flex-end;
+					flex-flow: row wrap;
+
+					span {
+						margin-bottom: 0.2em;
+
+						&.article-site-info {
+							font-size: 0.9em;
+
+							.icon {
+								margin: 0;
+								margin-right: 4px;
+								max-height: 16px;
+								vertical-align: bottom;
+							}
+						}
+
+						&.article-date {
+							font-size: 0.85em;
+						}
+					}
+				}
+
+				.article-title {
+					margin-bottom: 0.4em;
+
+					> * {
+						margin: 0;
+						font-weight: 500;
+						font-size: 1em;
+						line-height: 1em;
+					}
+
+					a {
+						color: #424242;
+						font-weight: 600;
+					}
+				}
+
+				.article-body {
+					font-size: 0.95em;
+					line-height: 0.98em;
+				}
+			}
+
+			.article-image-wrapper {
+				flex: 1 0 20%;
+				padding: 0;
+
+				.article-image {
+
+				}
+			}
+		}
+	}
+
+}
+
+@media only screen and (min-width: 480px) {
+	
+	.article {
+		.article-content {
+			.article-image-wrapper {
+				padding: 2px;
+			}
+		}
+	}
+}
+
+@media only screen and (min-width: 480px) {
+
+	.article {
+		.article-content {
+			.article-text-wrapper, .article-image-wrapper {
+				padding: 5px;
+			}
+		}
+	}
+	
+}
+
+@media only screen and (min-width: 650px) {
+
+	.article {
+		.article-content {
+			.article-text-wrapper, .article-image-wrapper {
+				padding: 5px 10px;
+			}
+		}
+	}
+	
+}
+
+@media only screen and (min-width: 800px) {
+
+	.article {
+		.article-content {
+			.article-text-wrapper {
+				.article-title {
+					> * {
+						font-size: 1.1em;
+						font-height: 1.1em;
+					}
+				}
+
+				.article-body {
+					font-size: 1em;
+					font-height: 1em;
+				}
+			}
+		}
+	}
+	
+}
