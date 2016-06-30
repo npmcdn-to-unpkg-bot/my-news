@@ -51,6 +51,7 @@ p {
 				margin: auto;
 				overflow: hidden;
 				max-height: 6em;
+				transition: 1s;
 			}
 
 			.article-text-wrapper {
@@ -113,6 +114,15 @@ p {
 
 				.article-image {
 
+				}
+			}
+		}
+
+		&.expand {
+			.article-content {
+
+				.article-text-wrapper, .article-image-wrapper {
+					max-height: none;
 				}
 			}
 		}

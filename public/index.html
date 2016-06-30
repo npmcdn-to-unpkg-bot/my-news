@@ -157,6 +157,15 @@ app.addArticle = function(article, isHidden = false) {
 	app.articlesList.insertBefore(articleTag, app.articlesList.firstChild);
 };
 
+app.toggleArticleExpansion = function(el) {
+	if (el.classList.contains('expand')) {
+		el.classList.remove('expand');
+	}
+	else {
+		el.classList.add('expand');
+	}
+};
+
 app.hideArticles = function(categoryClass = '') {
 	if (categoryClass !== '') {
 		categoryClass = '.'+categoryClass;
@@ -184,6 +193,12 @@ app.showArticles = function(categoryClass = '') {
 document.querySelectorAll('.all').forEach(function(el) {
 	el.addEventListener('click', function() {
 		app.showArticles();
+	});
+});
+
+document.querySelectorAll('.article').forEach(function(el) {
+	el.addEventListener('click', function() {
+		app.toggleArticleExpansion(this);
 	});
 });
 

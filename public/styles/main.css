@@ -37,7 +37,8 @@ p {
     .article .article-content .article-text-wrapper, .article .article-content .article-image-wrapper {
       margin: auto;
       overflow: hidden;
-      max-height: 6em; }
+      max-height: 6em;
+      transition: 1s; }
     .article .article-content .article-text-wrapper {
       flex: 1 0 80%;
       padding: 2px; }
@@ -74,7 +75,9 @@ p {
         line-height: 0.98em; }
     .article .article-content .article-image-wrapper {
       flex: 1 0 20%;
-      padding: 0; } }
+      padding: 0; }
+    .article.expand .article-content .article-text-wrapper, .article.expand .article-content .article-image-wrapper {
+      max-height: none; } }
 @media only screen and (min-width: 480px) {
   .article .article-content .article-image-wrapper {
     padding: 2px; } }
