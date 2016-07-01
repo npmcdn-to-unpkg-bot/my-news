@@ -1,181 +1,182 @@
 
 (function() {
-  'use strict';
 
-  var app = {
-    isLoading: true,
-    visibleCards: {},
-    selectedCities: [],
-    spinner: document.querySelector('.loader'),
-    cardTemplate: document.querySelector('.cardTemplate'),
-    container: document.querySelector('.main'),
-    addDialog: document.querySelector('.dialog-container'),
-    daysOfWeek: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-  };
+'use strict';
 
+// --------------------------
+// 		CONFIGURATION
+// --------------------------
 
-  /*****************************************************************************
-   *
-   * Event listeners for UI elements
-   *
-   ****************************************************************************/
+var socket = io();
+var feathersApp = feathers();
+feathersApp.configure(feathers.socketio(socket));
 
-  document.getElementById('butRefresh').addEventListener('click', function() {
-    // Refresh all of the forecasts
-    app.updateForecasts();
-  });
+var categoryService = feathersApp.service('categories');
+var articleService = feathersApp.service('articles');
 
-  document.getElementById('butAdd').addEventListener('click', function() {
-    // Open/show the add new city dialog
-    app.toggleAddDialog(true);
-  });
+var app = {
+	isLoading: true,
+	menuTop: document.getElementById('menuTop'),
+	drawer: document.getElementById('drawer'),
+	articlesList: document.getElementById('articlesList'),
+	articleTemplate: document.querySelector('.article-template'),
+	categoryTemplate: document.querySelector('.category-template'),
+	spinner: document.querySelector('.loader'),
+	categories: []
+};
 
-  document.getElementById('butAddCity').addEventListener('click', function() {
-    // Add the newly selected city
-    var select = document.getElementById('selectCityToAdd');
-    var selected = select.options[select.selectedIndex];
-    var key = selected.value;
-    var label = selected.textContent;
-    app.getForecast(key, label);
-    app.selectedCities.push({key: key, label: label});
-    app.toggleAddDialog(false);
-  });
+// --------------------------
+// 		METHODS
+// --------------------------
 
-  document.getElementById('butAddCancel').addEventListener('click', function() {
-    // Close the add new city dialog
-    app.toggleAddDialog(false);
-  });
+app.addCategory = function(category) {
+	app.categories.push(category);
+	var categoryLink = app.categoryTemplate.cloneNode(true);
+	categoryLink.classList.remove('category-template');
+	categoryLink.classList.add('link_'+category._id);
+	categoryLink.textContent = category.displayName;
+	categoryLink.removeAttribute('hidden');
+	app.menuTop.appendChild(categoryLink);
+	app.drawer.appendChild(categoryLink.cloneNode(true));
+	document.querySelectorAll('.link_'+category._id).forEach(function(catLink) {
+		catLink.addEventListener('click', function() {
+			app.displayCategory(category);
+		});
+	});
+};
 
+app.displayCategory = function(category) {
+	app.hideArticles();
+	app.showArticles(category._id);
+};
 
-  /*****************************************************************************
-   *
-   * Methods to update/refresh the UI
-   *
-   ****************************************************************************/
+app.addArticle = function(article, isHidden = false) {
+	var articleTag = app.articleTemplate.cloneNode(true);
+	articleTag.classList.remove('article-template');
+	articleTag.classList.add(article.category_id);
+	articleTag.setAttribute('id', article._id);
 
-  // Toggles the visibility of the add new city dialog.
-  app.toggleAddDialog = function(visible) {
-    if (visible) {
-      app.addDialog.classList.add('dialog-container--visible');
-    } else {
-      app.addDialog.classList.remove('dialog-container--visible');
-    }
-  };
+	if (article.siteName) {
+		articleTag.querySelector('.article-site-info').innerHTML += article.siteName;
+	}
 
-  // Updates a weather card with the latest weather forecast. If the card
-  // doesn't already exist, it's cloned from the template.
-  app.updateForecastCard = function(data) {
-    var card = app.visibleCards[data.key];
-    if (!card) {
-      card = app.cardTemplate.cloneNode(true);
-      card.classList.remove('cardTemplate');
-      card.querySelector('.location').textContent = data.label;
-      card.removeAttribute('hidden');
-      app.container.appendChild(card);
-      app.visibleCards[data.key] = card;
-    }
-    card.querySelector('.description').textContent = data.currently.summary;
-    card.querySelector('.date').textContent =
-      new Date(data.currently.time * 1000);
-    card.querySelector('.current .icon').classList.add(data.currently.icon);
-    card.querySelector('.current .temperature .value').textContent =
-      Math.round(data.currently.temperature);
-    card.querySelector('.current .feels-like .value').textContent =
-      Math.round(data.currently.apparentTemperature);
-    card.querySelector('.current .precip').textContent =
-      Math.round(data.currently.precipProbability * 100) + '%';
-    card.querySelector('.current .humidity').textContent =
-      Math.round(data.currently.humidity * 100) + '%';
-    card.querySelector('.current .wind .value').textContent =
-      Math.round(data.currently.windSpeed);
-    card.querySelector('.current .wind .direction').textContent =
-      data.currently.windBearing;
-    var nextDays = card.querySelectorAll('.future .oneday');
-    var today = new Date();
-    today = today.getDay();
-    for (var i = 0; i < 7; i++) {
-      var nextDay = nextDays[i];
-      var daily = data.daily.data[i];
-      if (daily && nextDay) {
-        nextDay.querySelector('.date').textContent =
-          app.daysOfWeek[(i + today) % 7];
-        nextDay.querySelector('.icon').classList.add(daily.icon);
-        nextDay.querySelector('.temp-high .value').textContent =
-          Math.round(daily.temperatureMax);
-        nextDay.querySelector('.temp-low .value').textContent =
-          Math.round(daily.temperatureMin);
-      }
-    }
-    if (app.isLoading) {
-      app.spinner.setAttribute('hidden', true);
-      app.container.removeAttribute('hidden');
-      app.isLoading = false;
-    }
-  };
+	if (article.siteIcon && article.siteIcon !== '') {
+		articleTag.querySelector('.icon').setAttribute('src', article.siteIcon);
+	}
+	else {
+		articleTag.querySelector('.icon').remove();
+	}
 
+	if (article.createdAt) {
+		var datePublished = moment(article.createdAt, moment.ISO_8601);
+		articleTag.querySelector('.article-date').textContent = datePublished.format('ddd, Do MMM YYYY - hh:mm');
+	}
 
-  /*****************************************************************************
-   *
-   * Methods for dealing with the model
-   *
-   ****************************************************************************/
+	if (article.titleHtml) {
+		articleTag.querySelector('.article-title').innerHTML += article.titleHtml;
+	}
 
-  // Gets a forecast for a specific city and update the card with the data
-  app.getForecast = function(key, label) {
-    var url = 'https://publicdata-weather.firebaseio.com/';
-    url += key + '.json';
-    // Make the XHR to get the data, then update the card
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
-      if (request.readyState === XMLHttpRequest.DONE) {
-        if (request.status === 200) {
-          var response = JSON.parse(request.response);
-          response.key = key;
-          response.label = label;
-          app.hasRequestPending = false;
-          app.updateForecastCard(response);
-        }
-      }
-    };
-    request.open('GET', url);
-    request.send();
-  };
+	if (article.bodyHtml) {
+		articleTag.querySelector('.article-body').innerHTML += article.bodyHtml;
+	}
 
-  // Iterate all of the cards and attempt to get the latest forecast data
-  app.updateForecasts = function() {
-    var keys = Object.keys(app.visibleCards);
-    keys.forEach(function(key) {
-      app.getForecast(key);
-    });
-  };
+	if (article.image && article.image !== '') {
+		articleTag.querySelector('.article-image').setAttribute('src', article.image);
+	}
 
-  var fakeForecast = {
-    key: 'newyork',
-    label: 'New York, NY',
-    currently: {
-      time: 1453489481,
-      summary: 'Clear',
-      icon: 'partly-cloudy-day',
-      temperature: 30,
-      apparentTemperature: 21,
-      precipProbability: 0.80,
-      humidity: 0.17,
-      windBearing: 125,
-      windSpeed: 1.52
-    },
-    daily: {
-      data: [
-        {icon: 'clear-day', temperatureMax: 36, temperatureMin: 31},
-        {icon: 'rain', temperatureMax: 34, temperatureMin: 28},
-        {icon: 'snow', temperatureMax: 31, temperatureMin: 17},
-        {icon: 'sleet', temperatureMax: 38, temperatureMin: 31},
-        {icon: 'fog', temperatureMax: 40, temperatureMin: 36},
-        {icon: 'wind', temperatureMax: 35, temperatureMin: 29},
-        {icon: 'partly-cloudy-day', temperatureMax: 42, temperatureMin: 40}
-      ]
-    }
-  };
-  // Uncomment the line below to test with the provided fake data
-  // app.updateForecastCard(fakeForecast);
+	articleTag.removeAttribute('hidden');
+
+	if (isHidden) {
+		articleTag.style.display = 'none';
+	}
+
+	app.articlesList.insertBefore(articleTag, app.articlesList.firstChild);
+};
+
+app.toggleArticleExpansion = function(el) {
+	if (el.classList.contains('expand')) {
+		el.classList.remove('expand');
+	}
+	else {
+		el.classList.add('expand');
+	}
+};
+
+app.hideArticles = function(categoryClass = '') {
+	if (categoryClass !== '') {
+		categoryClass = '.'+categoryClass;
+	}
+
+	document.querySelectorAll('.article'+categoryClass).forEach(function(el) {
+		el.style.display = 'none';
+	});
+};
+
+app.showArticles = function(categoryClass = '') {
+	if (categoryClass !== '') {
+		categoryClass = '.'+categoryClass;
+	}
+
+	document.querySelectorAll('.article'+categoryClass).forEach(function(el) {
+		el.style.display = '';
+	});
+};
+
+// --------------------------
+// 		EVENT LISTENERS
+// --------------------------
+
+document.querySelectorAll('.all').forEach(function(el) {
+	el.addEventListener('click', function() {
+		app.showArticles();
+	});
+});
+
+document.querySelectorAll('.article').forEach(function(el) {
+	el.addEventListener('click', function() {
+		app.toggleArticleExpansion(this);
+	});
+});
+
+categoryService.on('created', function(category) {
+	app.addCategory(category);
+});
+
+articleService.on('created', function(article) {
+	var isHidden = false;
+	// Figure out if the article's category is currently displayed.
+	var anArticleOfSameCategory = document.querySelector('.article.'+article.category_id);
+	if (anArticleOfSameCategory) {
+		if (anArticleOfSameCategory.style.display == 'none') {
+			isHidden = true;
+		}
+	}
+
+	app.addArticle(article, isHidden);
+});
+
+// --------------------------
+// 		INIT
+// --------------------------
+
+categoryService.find({ query: { $sort: { displayName: 1 }}}, function(error, result) {
+	if (!result) {
+		return;
+	}
+
+	result.forEach(function(cat) {
+		app.addCategory(cat);
+	});
+});
+
+articleService.find({ query: { $sort: { createdAt: 1 }}}, function(error, result) {
+	if (!result) {
+		return;
+	}
+
+	result.forEach(function(article) {
+		app.addArticle(article);
+	});
+});
 
 })();
