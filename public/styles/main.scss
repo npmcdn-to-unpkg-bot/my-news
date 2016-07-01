@@ -43,20 +43,22 @@ p {
 
 	.article {
 		border-bottom: 1px solid #f3f3f3;
-		align-items: flex-start;
 
 		.article-content {
+			align-items: flex-start;
 
 			.article-text-wrapper, .article-image-wrapper {
-				margin: auto;
+				margin-left: auto;
+				margin-right: auto;
 				overflow: hidden;
 				max-height: 6em;
-				transition: 1s;
+				transition: 0.25s;
 			}
 
 			.article-text-wrapper {
-				flex: 1 0 80%;
+				flex: 1 0 75%;
 				padding: 2px;
+				margin-top: 0;
 
 				.article-header {
 					font-size: 0.9em;
@@ -109,8 +111,9 @@ p {
 			}
 
 			.article-image-wrapper {
-				flex: 1 0 20%;
+				flex: 1 0 25%;
 				padding: 0;
+				text-align: center;
 
 				.article-image {
 
@@ -122,7 +125,8 @@ p {
 			.article-content {
 
 				.article-text-wrapper, .article-image-wrapper {
-					max-height: none;
+					max-height: 24em;
+					transition: max-height 1s;
 				}
 			}
 		}

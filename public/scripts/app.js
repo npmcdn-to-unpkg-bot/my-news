@@ -3,6 +3,8 @@
 
 'use strict';
 
+/* globals io, feathers, document, moment */
+
 // --------------------------
 // 		CONFIGURATION
 // --------------------------
@@ -90,6 +92,10 @@ app.addArticle = function(article, isHidden = false) {
 		articleTag.style.display = 'none';
 	}
 
+	articleTag.addEventListener('click', function() {
+		app.toggleArticleExpansion(this);
+	});
+
 	app.articlesList.insertBefore(articleTag, app.articlesList.firstChild);
 };
 
@@ -132,12 +138,6 @@ document.querySelectorAll('.all').forEach(function(el) {
 	});
 });
 
-document.querySelectorAll('.article').forEach(function(el) {
-	el.addEventListener('click', function() {
-		app.toggleArticleExpansion(this);
-	});
-});
-
 categoryService.on('created', function(category) {
 	app.addCategory(category);
 });
@@ -147,7 +147,7 @@ articleService.on('created', function(article) {
 	// Figure out if the article's category is currently displayed.
 	var anArticleOfSameCategory = document.querySelector('.article.'+article.category_id);
 	if (anArticleOfSameCategory) {
-		if (anArticleOfSameCategory.style.display == 'none') {
+		if (anArticleOfSameCategory.style.display === 'none') {
 			isHidden = true;
 		}
 	}
