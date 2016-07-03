@@ -1,3 +1,5 @@
+$section-max-width: 800px;
+
 html {
 	box-sizing: border-box;
 }
@@ -29,12 +31,11 @@ p {
 }
 
 .section {
-	max-width: 800px;
+	max-width: $section-max-width;
 	margin: auto;
 }
 
 #articlesList {
-	background: #fff;
 	margin: 0;
 	padding: 0;
 }
@@ -42,7 +43,10 @@ p {
 @media only screen and (min-width: 300px) {
 
 	.article {
+		background: #fff;
 		border-bottom: 1px solid #f3f3f3;
+		margin: 0;
+		transition: margin 0.3s 0s ease;
 
 		.article-content {
 			align-items: flex-start;
@@ -52,7 +56,6 @@ p {
 				margin-right: auto;
 				overflow: hidden;
 				max-height: 6em;
-				transition: 0.75s 0s ease-out;
 			}
 
 			.article-text-wrapper {
@@ -126,11 +129,13 @@ p {
 		}
 
 		&.expand {
+			z-index: 10;
+			margin: 1.2em auto;
+
 			.article-content {
 
 				.article-text-wrapper, .article-image-wrapper {
-					max-height: 48em;
-					transition: max-height 0.5s 0s ease-out;
+					max-height: none;
 				}
 			}
 		}
@@ -193,4 +198,16 @@ p {
 		}
 	}
 	
+}
+
+@media only screen and (min-width: 840px) {
+
+	.article {
+
+		&.expand {
+			margin-left: -14px;
+			margin-right: -14px;
+		}
+
+	}
 }

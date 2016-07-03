@@ -102,9 +102,16 @@ app.addArticle = function(article, isHidden = false) {
 app.toggleArticleExpansion = function(el) {
 	if (el.classList.contains('expand')) {
 		el.classList.remove('expand');
+		el.classList.remove('mdl-shadow--4dp');
 	}
 	else {
+		document.querySelectorAll('.article.expand').forEach(function(e) {
+			e.classList.remove('expand');
+			e.classList.remove('mdl-shadow--4dp');
+		});
+
 		el.classList.add('expand');
+		el.classList.add('mdl-shadow--4dp');
 	}
 };
 
@@ -159,6 +166,9 @@ articleService.on('created', function(article) {
 // 		INIT
 // --------------------------
 
+// before is now minus some days;
+var before = moment().subtract(3, 'days');
+
 categoryService.find({ query: { $sort: { displayName: 1 }}}, function(error, result) {
 	if (!result) {
 		return;
@@ -169,6 +179,7 @@ categoryService.find({ query: { $sort: { displayName: 1 }}}, function(error, re
 	});
 });
 
+//articleService.find({ query: { createdAt: { $gte: before.format() }, $sort: { createdAt: 1 }}}, function(error, result) {
 articleService.find({ query: { $sort: { createdAt: 1 }}}, function(error, result) {
 	if (!result) {
 		return;
