@@ -17,12 +17,12 @@ module.exports = function(options) {
 			throw new Error('You need to provide a selector for the article.');
 		}
 		if(!articleToSanitize.link) {
-			throw new Error('You need to provide a title for the article.');
+			throw new Error('You need to provide a link for the article.');
 		}
 
 		articleToSanitize.createdAt = new Date().getTime();
 
-		return this.find({ query: { title: articleToSanitize.title, link: articleToSanitize.link, $limit: 1 } }).then(result => {
+		return this.find({ query: { $or: [ { title: articleToSanitize.title }, { link: articleToSanitize.link }] }, $limit: 1 }).then(result => {
 			if (result.length !== 0) {
 				throw new Error('Article already exists.');
 			}
