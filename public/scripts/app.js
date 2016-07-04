@@ -49,13 +49,13 @@ app.addCategory = function(category) {
 
 app.displayCategory = function(category) {
 	app.hideArticles();
-	app.showArticles(category._id);
+	app.showArticles('cat_'+category._id);
 };
 
 app.addArticle = function(article, isHidden = false) {
 	var articleTag = app.articleTemplate.cloneNode(true);
 	articleTag.classList.remove('article-template');
-	articleTag.classList.add(article.category_id);
+	articleTag.classList.add('cat_'+article.category_id);
 	articleTag.setAttribute('id', article._id);
 
 	if (article.siteName) {
@@ -70,8 +70,8 @@ app.addArticle = function(article, isHidden = false) {
 	}
 
 	if (article.createdAt) {
-		var datePublished = moment(article.createdAt, moment.ISO_8601);
-		articleTag.querySelector('.article-date').textContent = datePublished.format('ddd, Do MMM YYYY - hh:mm');
+		var datePublished = moment(article.createdAt);
+		articleTag.querySelector('.article-date').textContent = datePublished.calendar(); //format('ddd, Do MMM YYYY - hh:mm');
 	}
 
 	if (article.titleHtml) {
@@ -152,7 +152,7 @@ categoryService.on('created', function(category) {
 articleService.on('created', function(article) {
 	var isHidden = false;
 	// Figure out if the article's category is currently displayed.
-	var anArticleOfSameCategory = document.querySelector('.article.'+article.category_id);
+	var anArticleOfSameCategory = document.querySelector('.article.cat_'+article.category_id);
 	if (anArticleOfSameCategory) {
 		if (anArticleOfSameCategory.style.display === 'none') {
 			isHidden = true;
@@ -179,8 +179,7 @@ categoryService.find({ query: { $sort: { displayName: 1 }}}, function(error, re
 	});
 });
 
-//articleService.find({ query: { createdAt: { $gte: before.format() }, $sort: { createdAt: 1 }}}, function(error, result) {
-articleService.find({ query: { $sort: { createdAt: 1 }}}, function(error, result) {
+articleService.find({ query: { createdAt: { $gte: before.valueOf() }, $sort: { createdAt: 1 }}}, function(error, result) {
 	if (!result) {
 		return;
 	}

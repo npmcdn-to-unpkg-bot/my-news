@@ -20,7 +20,7 @@ module.exports = function(options) {
 			throw new Error('You need to provide a title for the article.');
 		}
 
-		articleToSanitize.createdAt = new Date();
+		articleToSanitize.createdAt = new Date().getTime();
 
 		return this.find({ query: { title: articleToSanitize.title, link: articleToSanitize.link, $limit: 1 } }).then(result => {
 			if (result.length !== 0) {
