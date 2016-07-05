@@ -1,0 +1,23 @@
+source: {
+	name: '',
+	icon: '',
+	baseUrl: 'http://www.example.com',
+	localUrls: [
+		'name' = '/localUrl',
+		...
+	],
+}
+
+crawlerConfig: {
+	source_id: n,
+	sourceLocalUrlName: '',
+	articleSelector: '',
+	tags: [
+		'tagName' = {
+			selector: '',
+			toHtml: boolean,
+			regex: ''
+		}
+	],
+	toUse: boolean
+}
