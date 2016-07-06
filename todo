@@ -21,3 +21,9 @@ crawlerConfig: {
 	],
 	toUse: boolean
 }
+
+tracker: {
+	crawlerConfig_id: n,
+	category_id: n,
+	interval: n
+}

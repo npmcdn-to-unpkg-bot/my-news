@@ -1,4 +1,5 @@
 'use strict';
+const sources = require('./sources');
 const categories = require('./categories');
 const articles = require('./articles');
 const authentication = require('./authentication');
@@ -12,4 +13,5 @@ module.exports = function() {
   app.configure(user);
   app.configure(articles);
   app.configure(categories);
+  app.configure(sources);
 };
