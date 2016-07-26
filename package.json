@@ -19,7 +19,10 @@
     "test": "npm run jshint && npm run mocha",
     "jshint": "jshint src/. test/. --config",
     "start": "node src/",
-    "mocha": "mocha test/ --recursive"
+    "mocha": "mocha test/ --recursive",
+	"run-crawlers": "node src/scripts/runCrawlers.js",
+	"populate-crawlers": "node src/scripts/populateCrawlers.js",
+	"populate-categories": "node src/scripts/populateCategories.js"
   },
   "dependencies": {
     "body-parser": "^1.15.1",
@@ -30,7 +33,7 @@
     "feathers-configuration": "^0.2.3",
     "feathers-errors": "^2.2.0",
     "feathers-hooks": "^1.5.4",
-    "feathers-nedb": "^2.3.0",
+    "feathers-nedb": "^2.4.1",
     "feathers-rest": "^1.4.1",
     "feathers-socketio": "^1.4.1",
     "nedb": "^1.8.0",

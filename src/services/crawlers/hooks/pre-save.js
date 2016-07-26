@@ -1,6 +1,6 @@
 'use strict';
 
-// src/services/sources/hooks/pre-save.js
+// src/services/crawlers/hooks/pre-save.js
 //
 // Use this hook to manipulate incoming or outgoing data.
 // For more information on hooks see: http://docs.feathersjs.com/hooks/readme.html
@@ -13,25 +13,22 @@ module.exports = function(options) {
 
 	return function(hook) {
 		const sourceToSanitize = hook.data;
-		const allowedFiels = ['_id', 'name', 'icon', 'baseUrl', 'localUrls'];
+		const allowedFiels = ['_id', 'url', 'articleSelector', 'tags'];
 		const fields = [{
 			name: '_id',
 			type: 'alphanum',
 			maxLength: 20
 		}, {
-			name: 'name',
-			mandatory: true,
-			type: 'string'
-		}, { 
-			name: 'icon',
+			name: 'url',
 			mandatory: true,
 			type: 'string'
 		}, {
-			name: 'baseUrl',
+			name: 'articleSelector',
 			mandatory: true,
 			type: 'string'
 		}, {
-			name: 'localUrls',
+			name: 'tags',
+			mandatory: true,
 			type: 'object'
 		}];
 

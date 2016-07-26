@@ -2,24 +2,22 @@ source: {
 	name: '',
 	icon: '',
 	baseUrl: 'http://www.example.com',
-	localUrls: [
+	localUrls: {
 		'name' = '/localUrl',
 		...
-	],
+	},
 }
 
 crawlerConfig: {
 	source_id: n,
-	sourceLocalUrlName: '',
 	articleSelector: '',
-	tags: [
+	tags: {
 		'tagName' = {
 			selector: '',
-			toHtml: boolean,
-			regex: ''
+			contains: '',
+			rejects: ''
 		}
-	],
-	toUse: boolean
+	}
 }
 
 tracker: {

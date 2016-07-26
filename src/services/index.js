@@ -1,4 +1,5 @@
 'use strict';
+const crawlers = require('./crawlers');
 const sources = require('./sources');
 const categories = require('./categories');
 const articles = require('./articles');
@@ -14,4 +15,5 @@ module.exports = function() {
   app.configure(articles);
   app.configure(categories);
   app.configure(sources);
+  app.configure(crawlers);
 };
