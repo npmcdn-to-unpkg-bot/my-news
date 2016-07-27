@@ -20,12 +20,14 @@
     "jshint": "jshint src/. test/. --config",
     "start": "node src/",
     "mocha": "mocha test/ --recursive",
-	"run-crawlers": "node src/scripts/runCrawlers.js",
-	"populate-crawlers": "node src/scripts/populateCrawlers.js",
-	"populate-categories": "node src/scripts/populateCategories.js"
+    "run-crawlers": "node src/scripts/runCrawlers.js",
+    "populate-crawlers": "node src/scripts/populateCrawlers.js",
+    "populate-categories": "node src/scripts/populateCategories.js"
   },
   "dependencies": {
+    "axios": "^0.13.1",
     "body-parser": "^1.15.1",
+    "cheerio": "^0.20.0",
     "compression": "^1.6.2",
     "cors": "^2.7.1",
     "feathers": "^2.0.1",
