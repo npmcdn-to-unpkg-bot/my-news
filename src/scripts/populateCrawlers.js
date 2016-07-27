@@ -13,6 +13,12 @@ const crawlersConfig = [{
 	tags: {
 		title: {
 			selector: '.meta-data h3 a'
+		},
+		link: {
+			selector: '.meta-data h3 a'
+		},
+		image: {
+			selector: 'img.comic-thumbnail'
 		}
 	}
 }];

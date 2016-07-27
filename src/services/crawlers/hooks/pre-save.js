@@ -5,7 +5,7 @@
 // Use this hook to manipulate incoming or outgoing data.
 // For more information on hooks see: http://docs.feathersjs.com/hooks/readme.html
 
-const validator = require('../../../validator');
+const validator = require('../../../utils/validator');
 const defaults = {};
 
 module.exports = function(options) {
@@ -34,6 +34,13 @@ module.exports = function(options) {
 
 		validator.checkAllowedFields(sourceToSanitize, allowedFiels);
 		validator.validate(sourceToSanitize, fields);
+
+		const tags = sourceToSanitize.tags;
+		for (let key in tags) {
+			if (!tags[key].selector) {
+				throw new Error('Error when trying to save crawler: tags should have a selector');
+			}
+		}
 
 		hook.preSave = true;
 	};
