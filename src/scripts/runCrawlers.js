@@ -2,17 +2,13 @@
 
 const app = require('../app');
 const crawlersService = app.service('crawlers');
-const Crawler = require('../utils/Crawler');
-
-console.log('Starting run-crawlers');
+const helpers = require('../utils/helpers');
 
 crawlersService.find()
 	.then(function(crawlersConfigs) {
-		return crawlersConfigs.map(function(crawlerConf) {
-			const crawler = new Crawler(crawlerConf);
-			return crawler.getFormattedArticles();
-		});
+		return helpers.crawlersHelper.getArticles(crawlersConfigs);
 	})
+	.then(console.log)
 	.catch(function(err) {
-		console.warn('Error while trying to fetch crawlers: ', err);
+		console.warn('runCrawlers, error while trying to fetch crawlers: ', err);
 	});

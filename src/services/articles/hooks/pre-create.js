@@ -14,7 +14,7 @@ module.exports = function(options) {
 		const articleToSanitize = hook.data;
 
 		if(!articleToSanitize.title) {
-			throw new Error('You need to provide a selector for the article.');
+			throw new Error('You need to provide a title for the article.');
 		}
 		if(!articleToSanitize.link) {
 			throw new Error('You need to provide a link for the article.');

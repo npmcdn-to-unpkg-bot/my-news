@@ -13,7 +13,7 @@ module.exports = function(options) {
 
 	return function(hook) {
 		const sourceToSanitize = hook.data;
-		const allowedFiels = ['_id', 'url', 'articleSelector', 'tags'];
+		const allowedFiels = ['_id', 'url', 'articleSelector', 'tags', 'categories_ids'];
 		const fields = [{
 			name: '_id',
 			type: 'alphanum',
@@ -30,6 +30,9 @@ module.exports = function(options) {
 			name: 'tags',
 			mandatory: true,
 			type: 'object'
+		}, {
+			name: 'categories_ids',
+			type: 'array'
 		}];
 
 		validator.checkAllowedFields(sourceToSanitize, allowedFiels);
@@ -41,6 +44,14 @@ module.exports = function(options) {
 				throw new Error('Error when trying to save crawler: tags should have a selector');
 			}
 		}
+
+		// Check if the crawler already exists
+		return this.find({ query: { url: sourceToSanitize.url, articleSelector: sourceToSanitize.articleSelector }, $limit: 1 })
+			.then(function(result) {
+				if (result.length !== 0) {
+					throw new Error('Crawler already exists.');
+				}
+			});
 
 		hook.preSave = true;
 	};

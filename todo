@@ -17,11 +17,6 @@ crawlerConfig: {
 			contains: '',
 			rejects: ''
 		}
-	}
-}
-
-tracker: {
-	crawlerConfig_id: n,
-	category_id: n,
-	interval: n
+	},
+	categories: []
 }

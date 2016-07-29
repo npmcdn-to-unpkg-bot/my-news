@@ -1,35 +1,37 @@
 'use strict';
 
-const validator = require('../utils/validator');
+//const validator = require('../utils/validator');
 const axios = require('axios');
 const cheerio = require('cheerio');
 
 const Crawler = class Crawler {
 
 	constructor(crawlerConfig) {
-		const allowedKeys = ['_id', 'url', 'articleSelector', 'tags'];
-		const fields = [{
-			name: 'url',
-			mandatory: true,
-			type: 'string'
-		}, {
-			name: 'articleSelector',
-			mandatory: true,
-			type: 'string'
-		}, {
-			name: 'tags',
-			mandatory: true,
-			type: 'object'
-		}];
+		// Skipping validation as crawler has been validated before by pre-save hook of services crawlers.
+		// 
+		//const allowedKeys = ['_id', 'url', 'articleSelector', 'tags'];
+		//const fields = [{
+			//name: 'url',
+			//mandatory: true,
+			//type: 'string'
+		//}, {
+			//name: 'articleSelector',
+			//mandatory: true,
+			//type: 'string'
+		//}, {
+			//name: 'tags',
+			//mandatory: true,
+			//type: 'object'
+		//}];
 
-		validator.checkAllowedFields(crawlerConfig, allowedKeys);
-		validator.validate(crawlerConfig, fields);
+		//validator.checkAllowedFields(crawlerConfig, allowedKeys);
+		//validator.validate(crawlerConfig, fields);
 
-		for (let key in crawlerConfig.tags) {
-			if (!crawlerConfig.tags[key].selector) {
-				throw new Error('Crawler:constructor error: tags should have a selector');
-			}
-		}
+		//for (let key in crawlerConfig.tags) {
+			//if (!crawlerConfig.tags[key].selector) {
+				//throw new Error('Crawler:constructor error: tags should have a selector');
+			//}
+		//}
 
 		this.url = crawlerConfig.url;
 		this.articleSelector = crawlerConfig.articleSelector;
@@ -73,7 +75,6 @@ const Crawler = class Crawler {
 				this.articles = formattedArticles;
 				return formattedArticles;
 			}.bind(this))
-			.then(console.log)
 			.catch(function(err) {
 				console.warn('Crawler:getFormattedArticles, error:', err);
 			});

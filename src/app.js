@@ -13,6 +13,8 @@ const bodyParser = require('body-parser');
 const socketio = require('feathers-socketio');
 const middleware = require('./middleware');
 const services = require('./services');
+const helpers = require('./utils/helpers');
+const axios = require('axios');
 
 const app = feathers();
 
@@ -30,5 +32,37 @@ app.use(compress())
   .configure(socketio())
   .configure(services)
   .configure(middleware);
+
+function crawlersTask() {
+	app.service('crawlers').find()
+		.then(function(crawlersConfigs) {
+			return helpers.crawlersHelper.getArticles(crawlersConfigs);
+		})
+		.then(function(crawlersArticles) {
+			const mergedArrayOfArticles = crawlersArticles.reduce(function(prev, current) {
+				return prev.concat(current);
+			}, []);
+
+			return mergedArrayOfArticles;
+		})
+		.then(function(mergedArrayOfArticles) {
+			return axios.all(mergedArrayOfArticles.map(function(article) {
+				return app.service('articles').create(article)
+					.catch(function(err) {
+						console.warn('app:crawlersTask, error when creating article', err);
+					});
+			}))
+			.catch(function(err) {
+				console.warn('app:crawlersTask, error when creating all articles', err);
+	 		});
+		})
+		.catch(function(err) {
+			console.warn('app:crawlerTask, error:', err);
+		});
+}
+
+crawlersTask();
+
+//setInterval(crawlersTask, 120000);
 
 module.exports = app;
