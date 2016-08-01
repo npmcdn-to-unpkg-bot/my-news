@@ -13,11 +13,13 @@ module.exports = function(options) {
 
 	return function(hook) {
 		const sourceToSanitize = hook.data;
-		const allowedFiels = ['_id', 'url', 'articleSelector', 'tags', 'categories_ids'];
+		const allowedFiels = ['_id', 'source_id', 'url', 'articleSelector', 'tags', 'category_id'];
 		const fields = [{
 			name: '_id',
-			type: 'alphanum',
-			maxLength: 20
+			type: 'alphanum'
+		}, {
+			name: 'source_id',
+			type: 'alphanum'
 		}, {
 			name: 'url',
 			mandatory: true,
@@ -31,8 +33,8 @@ module.exports = function(options) {
 			mandatory: true,
 			type: 'object'
 		}, {
-			name: 'categories_ids',
-			type: 'array'
+			name: 'category_id',
+			type: 'alphanum'
 		}];
 
 		validator.checkAllowedFields(sourceToSanitize, allowedFiels);

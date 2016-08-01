@@ -36,14 +36,7 @@ app.use(compress())
 function crawlersTask() {
 	app.service('crawlers').find()
 		.then(function(crawlersConfigs) {
-			return helpers.crawlersHelper.getArticles(crawlersConfigs);
-		})
-		.then(function(crawlersArticles) {
-			const mergedArrayOfArticles = crawlersArticles.reduce(function(prev, current) {
-				return prev.concat(current);
-			}, []);
-
-			return mergedArrayOfArticles;
+			return helpers.crawlersHelper.getMergedArticles(crawlersConfigs);
 		})
 		.then(function(mergedArrayOfArticles) {
 			return axios.all(mergedArrayOfArticles.map(function(article) {
@@ -61,7 +54,7 @@ function crawlersTask() {
 		});
 }
 
-crawlersTask();
+//crawlersTask();
 
 //setInterval(crawlersTask, 120000);
 

@@ -15,6 +15,19 @@ const helpers = {
 	crawlersHelper: {
 		getArticles: function(crawlersConfigs) {
 			return getCrawlersFormattedArticles(crawlersConfigs);
+		},
+		getMergedArticles: function(crawlersConfigs) {
+			return this.getArticles(crawlersConfigs)
+				.then(function(crawlersArticles) {
+					const mergedArrayOfArticles = crawlersArticles.reduce(function(prev, current) {
+						return prev.concat(current);
+					}, []);
+
+					return mergedArrayOfArticles;
+				})
+				.catch(function(err) {
+					console.warn('crawlersHelper:getMergedArticles error:', err);
+				});
 		}
 	}
 };

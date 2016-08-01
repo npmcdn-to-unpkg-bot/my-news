@@ -13,26 +13,25 @@ module.exports = function(options) {
 
 	return function(hook) {
 		const sourceToSanitize = hook.data;
-		const allowedFiels = ['_id', 'name', 'icon', 'baseUrl', 'localUrls'];
+		const allowedFiels = ['_id', 'name', 'displayName', 'icon', 'url'];
 		const fields = [{
 			name: '_id',
-			type: 'alphanum',
-			maxLength: 20
+			type: 'alphanum'
 		}, {
 			name: 'name',
 			mandatory: true,
 			type: 'string'
+		}, {
+			name: 'displayName',
+			mandatory: true,
+			type: 'string'
 		}, { 
 			name: 'icon',
-			mandatory: true,
 			type: 'string'
 		}, {
-			name: 'baseUrl',
+			name: 'url',
 			mandatory: true,
 			type: 'string'
-		}, {
-			name: 'localUrls',
-			type: 'object'
 		}];
 
 		validator.checkAllowedFields(sourceToSanitize, allowedFiels);

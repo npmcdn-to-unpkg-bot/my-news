@@ -21,8 +21,7 @@
     "start": "node src/",
     "mocha": "mocha test/ --recursive",
     "run-crawlers": "node src/scripts/runCrawlers.js",
-    "populate-crawlers": "node src/scripts/populateCrawlers.js",
-    "populate-categories": "node src/scripts/populateCategories.js"
+    "populate-db": "node src/scripts/populateDB.js"
   },
   "dependencies": {
     "axios": "^0.13.1",
