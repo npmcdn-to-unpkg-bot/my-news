@@ -50,23 +50,118 @@ const categoriesStore = [{
 	displayName: 'MK'
 }];
 
-const populater = {
-	resourcesCreated: {},
-	populate: function() {
-		const self = this;
-		axios.all(sourcesStore.map(function(source) {
-			return sources.create(source);
-		}))
-		.then(function(sources) {
-			self.resourcesCreated['sources'] = sources;
-		})
-		.then(function() {
-			console.log(self.resourcesCreated['sources']);
-		})
-		.catch(function(err) {
-			console.warn('populateDB, error while populating sources:', err);
-		});
+const crawlersStores = [{
+	url: 'http://www.markknopfler.com/news',
+	articleSelector: 'article.post',
+	tags: {
+		title: {
+			selector: 'h3'
+		},
+		link: {
+			selector: 'h3 a'
+		},
+		body: {
+			selector: 'p + p'
+		}
 	}
-};
+}, {
+	url: 'http://www.secretsofgrindea.com/index.php/dev-blog',
+	articleSelector: '#posts div.post',
+	tags: {
+		title: {
+			selector: 'div.header'
+		},
+		link: {
+			selector: 'div.header a'
+		},
+		body: {
+			selector: 'div.post-content div.edited-content'
+		},
+		image: {
+			selector: 'div.post-content div.edited-content img'
+		}
+	}
+}, {
+	url: 'https://twitter.com/hashtag/SecretsofGrindea?src=hash&lang=en',
+	articleSelector: 'div.stream ol li.stream-item div.tweet div.content',
+	tags: {
+		title: {
+			selector: 'div.js-tweet-text-container p'
+		},
+		link: {
+			selector: 'div.js-tweet-text-container p a'
+		},
+		image: {
+			selector: 'div.AdaptiveMedia img'
+		}
+	}
+}, {
+	url: 'http://lifehacker.com/',
+	articleSelector: 'section.main div.hfeed div.post-wrapper article',
+	tags: {
+		title: {
+			selector: 'header h1'
+		},
+		link: {
+			selector: 'header h1 a'
+		},
+		image: {
+			selector: 'div.item__content figure.asset div.img-wrapper picture source'
+		}
+	}
+}, {
+	url: 'candh',
+	articleSelector: 'div.archive-list-item',
+	tags: {
+		title: {
+			selector: 'div.meta-data > h3'
+		},
+		link: {
+			selector: 'div.meta-data > h3 > a'
+		},
+		image: {
+			selector: 'img.comic-thumbnail'
+		},
+		body: {
+			selector: 'div.meta-data .author-credit-name'
+		}
+	}
+}];
 
-populater.populate();
+function populate() {
+	const self = this;
+
+	const populateSources = axios.all(sourcesStore.map(function(source) {
+		return sources.create(source)
+			.then(function(createdSource) {
+				console.log('Source created: ', createdSource);
+			})
+			.catch(function(err) {
+				console.log('Source was not created');
+			});
+	}));
+	
+	const populateCategories = axios.all(categoriesStore.map(function(category) {
+		return categories.create(category)
+			.then(function(createdCategory) {
+				console.log('Category created: ', createdCategory);
+			})
+			.catch(function(err) {
+				console.log('Category was not created');
+			});
+	}));
+
+	const populateCrawlers = axios.all(crawlersStores.map(function(crawler) {
+		return crawlers.create(crawler)
+			.then(function(createdCrawler) {
+				console.log('Crawler created: ', createdCrawler);
+			})
+			.catch(function(err) {
+				console.log('Crawler was not created');
+			});
+	}));
+
+	axios.all([populateSources, populateCategories, populateCrawlers]);
+}
+
+populate();

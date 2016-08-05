@@ -37,6 +37,14 @@ module.exports = function(options) {
 		validator.checkAllowedFields(sourceToSanitize, allowedFiels);
 		validator.validate(sourceToSanitize, fields);
 
+		// Check if source already exists
+		return this.find({ query: { $or: [ { name: sourceToSanitize.name }, { url: sourceToSanitize.url }] } })
+			.then(function(result) {
+				if (result.length !== 0) {
+					throw new Error('Source already exists.');
+				}
+			});
+
 		hook.preSave = true;
 	};
 };
